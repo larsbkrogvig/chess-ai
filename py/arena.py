@@ -14,8 +14,8 @@ from IPython.display import clear_output
 
 # In[ ]:
 
-import random
-import final
+import random_bot
+import final_bot
 
 
 # ### Parameters
