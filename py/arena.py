@@ -7,8 +7,6 @@ import sys
 import chess
 from time import sleep, time
 from random import random, choice
-from IPython.display import clear_output
-
 
 # # Bots
 
