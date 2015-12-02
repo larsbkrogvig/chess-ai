@@ -48,8 +48,8 @@ def get_status(board):
 
 # In[ ]:
 
-me_bot = mr_final
-he_bot = mr_random
+me_bot = final_bot
+he_bot = random_bot
 players = [chess.WHITE, chess.BLACK]
 min_turn_time = 1
 
