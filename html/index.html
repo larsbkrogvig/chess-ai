@@ -23,19 +23,18 @@
 
 var init = function() {
 
-  var ruyLopez = 'r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R';
-  var board = ChessBoard('board', ruyLopez);
+  var board = ChessBoard('board');
 
   function polling() {
     $.get(
-      "fen.txt", function(data) {
+      "fen", function(data) {
         board.position(data);
         console.log(data);
         }
       )
 
     $.get(
-      "status.txt", function(data) {
+      "status", function(data) {
         $("#status").html(data);
         console.log(data);
         }
