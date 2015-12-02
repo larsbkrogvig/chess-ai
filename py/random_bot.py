@@ -7,7 +7,6 @@ import sys
 import chess
 from time import sleep
 from random import random, choice
-from IPython.display import clear_output
 
 
 # # Search move
