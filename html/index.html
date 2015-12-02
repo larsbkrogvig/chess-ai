@@ -9,6 +9,7 @@
 </head>
 <body>
 
+<div id="player"></div>
 <div id="status"></div>
 <div id="board" style="width: 400px"></div>
 
@@ -25,6 +26,10 @@ function polling() {
    })
   $.get("status", function(data) {
     $("#status").html(data);
+    console.log(data);
+  })
+  $.get("player", function(data) {
+    $("#player").html(data);
     console.log(data);
   })
 }

@@ -61,12 +61,17 @@ while True:
     
     board = chess.Board() # Set up the board
     me = choice(players)  # My color
+
+    with open('../html/player', 'w') as f:
+        f.write('Bot plays '+turn_color[board.turn])
+        f.write(turn_color[not board.turn]+' is random\n')
         
     turn=0
     while not board.is_game_over():
         
         t0 = time()
         turn+=1
+
         
         with open('../html/fen', 'w') as f:
             f.write(board.fen())
