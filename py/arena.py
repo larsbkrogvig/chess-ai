@@ -48,7 +48,7 @@ def get_status(board):
 
 # In[ ]:
 
-me_bot = random_bot
+me_bot = basic_bot
 he_bot = random_bot
 players = [chess.WHITE, chess.BLACK]
 min_turn_time = 1
@@ -73,11 +73,11 @@ while True:
         if board.turn == me:
             with open('../html/status', 'w') as f:
                 f.write(str(1+turn/2) + ' - My move, ' + turn_color[board.turn])
-            move = me_bot.move(board, True) # My move!
+            move = me_bot.move(board) # My move!
         else:
             with open('../html/status', 'w') as f:
                 f.write(str(1+turn/2) + ' - His move, ' + turn_color[board.turn])
-            move = he_bot.move(board, True) # My opponent's move
+            move = he_bot.move(board) # My opponent's move
 
         board.push(move) # Make the move
 
