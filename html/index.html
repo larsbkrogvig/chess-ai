@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <title>Only Allow Legal Moves Example</title>
+  <title>Random Chess</title>
   <base href="http://chessboardjs.com/" />
 
   <link rel="stylesheet" href="css/chessboard.css" />
@@ -19,7 +19,6 @@
 <script src="js/jquery-1.11.3.min.js"></script>
 <script src="js/chessboard-0.3.0.min.js"></script>
 <script>
-
 var init = function() {
 
   var board = ChessBoard('board');
@@ -31,7 +30,6 @@ var init = function() {
         console.log(data);
         }
       )
-
     $.get(
       "status", function(data) {
         $("#status").html(data);
@@ -39,7 +37,6 @@ var init = function() {
         }
       )
   }
-
   setInterval(polling, 1000);
 
 };
