@@ -14,6 +14,7 @@ from random import random, choice
 
 import random_bot
 import final_bot
+import basic_bot
 
 
 # ### Parameters
