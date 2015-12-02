@@ -18,7 +18,6 @@
 <script src="js/jquery-1.11.3.min.js"></script>
 <script src="js/chessboard-0.3.0.min.js"></script>
 <script>
-
 var init = function() {
 
   var board = ChessBoard('board');
@@ -28,19 +27,17 @@ var init = function() {
       "fen", function(data) {
         board.position(data);
         }
-      );
+      )
     $.get(
       "status", function(data) {
         $("#status").html(data);
         }
-      );
+      )
   };
   setInterval(polling, 1000);
 
 };
-
 $(document).ready(init);
-
 </script>
 </body>
 </html>
