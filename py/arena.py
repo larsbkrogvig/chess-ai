@@ -63,7 +63,7 @@ while True:
     me = choice(players)  # My color
 
     with open('../html/player', 'w') as f:
-        f.write('Bot plays '+turn_color[board.turn]+'\n'+turn_color[not board.turn]+' is random\n')
+        f.write('Bot plays '+turn_color[board.turn]+', '+turn_color[not board.turn]+' is random\n')
         
     turn=0
     while not board.is_game_over():
