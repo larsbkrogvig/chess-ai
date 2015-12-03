@@ -44,7 +44,7 @@ def update_count(board, me):
 
 	result = None
 	if board.is_checkmate():
-		if board.turn == not me:
+		if not board.turn == me:
 			result = 'WIN'
 		else:
 			result = 'LOSE'
