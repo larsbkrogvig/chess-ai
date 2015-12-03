@@ -7,7 +7,7 @@ import sys
 import os
 import chess
 from time import sleep, time
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import random, choice
 
 datetime.fromtimestamp(time()).strftime('%Y-%m-%d %H:%M:%S')
@@ -94,10 +94,10 @@ min_turn_time = 1
 
 # In[ ]:
 
-while True:
+with open('../html/since', 'w') as f:
+	f.write((datetime.fromtimestamp(time())+timedelta(hours=1).strftime('%Y-%m-%d %H:%M:%S'))
 
-	with open('../html/since', 'w') as f:
-		f.write(datetime.fromtimestamp(time()).strftime('%Y-%m-%d %H:%M:%S'))
+while True:
 	
 	board = chess.Board() # Set up the board
 	me = choice(players)  # My color
