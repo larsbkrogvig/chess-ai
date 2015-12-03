@@ -14,6 +14,26 @@
 <div id="status"></div>
 <div id="board" style="width: 400px"></div>
 <br>
+<table border="1">
+<tr>
+<td>Bot:</td>
+<td>Win</td>
+<td>Draw</td>
+<td>Lose</td>
+</tr>
+<tr>
+<td>WHITE</td>
+<td><span id="W_win"></span></td>
+<td><span id="W_draw"></span></td>
+<td><span id="W_lose"></span></td>
+</tr>
+<tr>
+<td>BLACK</td>
+<td><span id="B_win"></span></td>
+<td><span id="B_draw"></span></td>
+<td><span id="B_lose"></span></td>
+</tr>
+</table>
 <script src="js/json3.min.js"></script>
 <script src="js/jquery-1.11.3.min.js"></script>
 <script src="js/chessboard-0.3.0.js"></script>
@@ -31,6 +51,30 @@ function polling() {
   })
   $.get("player", function(data) {
     $("#player").html(data);
+    console.log(data);
+  })
+  $.get("W_win", function(data) {
+    $("#W_win").html(data);
+    console.log(data);
+  })
+  $.get("W_draw", function(data) {
+    $("#W_draw").html(data);
+    console.log(data);
+  })
+  $.get("W_lose", function(data) {
+    $("#W_lose").html(data);
+    console.log(data);
+  })
+  $.get("B_win", function(data) {
+    $("#B_win").html(data);
+    console.log(data);
+  })
+  $.get("B_draw", function(data) {
+    $("#B_draw").html(data);
+    console.log(data);
+  })
+  $.get("B_lose", function(data) {
+    $("#B_lose").html(data);
     console.log(data);
   })
 }
