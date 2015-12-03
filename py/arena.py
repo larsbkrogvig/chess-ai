@@ -7,7 +7,10 @@ import sys
 import os
 import chess
 from time import sleep, time
+from datetime import datetime
 from random import random, choice
+
+datetime.fromtimestamp(time()).strftime('%Y-%m-%d %H:%M:%S')
 
 # # Bots
 
@@ -56,7 +59,7 @@ def update_count(board, me):
 	pass
 
 def increment_counter(fname):
-	if os.path.exists(fname):
+	if os.path.exists('../html/'+fname):
 		with open('../html/'+fname, 'r') as f:
 			n = f.read()
 		with open('../html/'+fname, 'w') as f:
@@ -92,6 +95,9 @@ min_turn_time = 1
 # In[ ]:
 
 while True:
+
+	with open('../html/since', 'w') as f:
+		f.write(datetime.fromtimestamp(time()).strftime('%Y-%m-%d %H:%M:%S'))
 	
 	board = chess.Board() # Set up the board
 	me = choice(players)  # My color

@@ -34,12 +34,18 @@
 <td><span id="B_lose"></span></td>
 </tr>
 </table>
+<br>
+<p>Since <span id="since"></span></p>
 <script src="js/json3.min.js"></script>
 <script src="js/jquery-1.11.3.min.js"></script>
 <script src="js/chessboard-0.3.0.js"></script>
 <script>
 var init = function() {
 var board = ChessBoard('board');
+$.get("since", function(data) {
+  $("#since").html(data);
+  console.log(data);
+}
 function polling() {
   $.get("fen", function(data) {
     board.position(data);
