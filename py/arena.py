@@ -95,7 +95,7 @@ min_turn_time = 1
 # In[ ]:
 
 with open('../html/since', 'w') as f:
-	f.write((datetime.fromtimestamp(time())+timedelta(hours=1).strftime('%Y-%m-%d %H:%M:%S'))
+	f.write((datetime.fromtimestamp(time())+timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S'))
 
 while True:
 	
