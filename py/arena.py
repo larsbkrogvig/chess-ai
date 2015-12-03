@@ -63,7 +63,7 @@ def increment_counter(fname):
 			f.write(str(int(n)+1))
 	else:
 		with open('../html/'+fname, 'w') as f:
-			f.write(str(0))
+			f.write(str(1))
 	pass
 
 def get_status(board):
