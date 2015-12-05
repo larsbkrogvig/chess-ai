@@ -130,7 +130,7 @@ while True:
     state['game_desc'] = get_status(board)
     state[get_config(board, me)] += 1
 
-    write_state()
+    write_state(state)
         
     sleep(8)
 
