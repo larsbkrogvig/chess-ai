@@ -1,91 +1,91 @@
-
-# coding: utf-8
-
-# In[ ]:
-
 import sys
 import os
+import json
 import chess
 from time import sleep, time
 from datetime import datetime, timedelta
 from random import random, choice
 
-datetime.fromtimestamp(time()).strftime('%Y-%m-%d %H:%M:%S')
-
-# # Bots
-
-# In[ ]:
-
+# Bots
 import random_bot
 import final_bot
 import basic_bot
 
+### Functions
 
-# ### Parameters
+def get_config(board, me):
+    cmap = {
+        ( 'WIN', 'WHITE'):  'W_win',
+        ('DRAW', 'WHITE'): 'W_draw',
+        ('LOSE', 'WHITE'): 'W_lose',
+        ( 'WIN', 'BLACK'):  'B_win',
+        ('DRAW', 'BLACK'): 'B_draw',
+        ('LOSE', 'BLACK'): 'B_lose'}
 
-# In[ ]:
+    result = None
+    if board.is_checkmate():
+        if not board.turn == me:
+            result = 'WIN'
+        else:
+            result = 'LOSE'
+    else:
+        result = 'DRAW'
 
-turn_color = {
-	True:'WHITE',
-	False:'BLACK',
-	None: None
-}
-
-
-# ### Utility functions
-
-# In[ ]:
-
-def update_count(board, me):
-	fmap = {
-	    ( 'WIN', 'WHITE'):  'W_win',
-	    ('DRAW', 'WHITE'): 'W_draw',
-	    ('LOSE', 'WHITE'): 'W_lose',
-	    ( 'WIN', 'BLACK'):  'B_win',
-	    ('DRAW', 'BLACK'): 'B_draw',
-	    ('LOSE', 'BLACK'): 'B_lose'}
-
-	result = None
-	if board.is_checkmate():
-		if not board.turn == me:
-			result = 'WIN'
-		else:
-			result = 'LOSE'
-	else:
-		result = 'DRAW'
-
-	increment_counter(fmap[(result,turn_color[me])])
-
-	pass
-
-def increment_counter(fname):
-	if os.path.exists('../html/'+fname):
-		with open('../html/'+fname, 'r') as f:
-			n = f.read()
-		with open('../html/'+fname, 'w') as f:
-			f.write(str(int(n)+1))
-	else:
-		with open('../html/'+fname, 'w') as f:
-			f.write(str(1))
-	pass
+    return cmap[(result,turn_color[me])]
 
 def get_status(board):
-	result = ""
-	if board.is_game_over():
-		if board.is_checkmate(): result = 'Checkmate! ' + turn_color[not board.turn] + ' wins'
-		if board.is_stalemate(): result = 'Stalemate! DRAW'
-		if board.is_insufficient_material(): result = 'Insufficient material. DRAW', 
-		if board.is_seventyfive_moves(): result = 'Seventyfive moves without capture or pawn move. DRAW'
-		if board.is_fivefold_repetition(): result = 'Fivefold repetition. DRAW'
-	else:
-		result = turn_color[board.turn], 'to move'
-	return result
+    result = ""
+    if board.is_game_over():
+        if board.is_checkmate(): result = 'Checkmate! ' + turn_color[not board.turn] + ' wins'
+        if board.is_stalemate(): result = 'Stalemate! DRAW'
+        if board.is_insufficient_material(): result = 'Insufficient material. DRAW', 
+        if board.is_seventyfive_moves(): result = 'Seventyfive moves without capture or pawn move. DRAW'
+        if board.is_fivefold_repetition(): result = 'Fivefold repetition. DRAW'
+    else:
+        result = turn_color[board.turn], 'to move'
+    return result
 
+### Parameters
 
-# # The Arena
+turn_color = {
+    True:'WHITE',
+    False:'BLACK',
+    None: None
+}
 
-# In[ ]:
+def new_state():
+    state = {
+        'played_since': '',
+        'game_desc':    '',
+        'fen':          '',
+        'turn_desc':    '',
+        'W_win':         0,
+        'W_draw':        0,
+        'W_lose':        0,
+        'B_win':         0,
+        'B_draw':        0,
+        'B_lose' :       0
+    }
+    return state
 
+def init_state():
+    state = None
+    if os.path.exists('../html/state'):
+        with open('../html/state', 'r') as f:
+            state = json.loads(f.read())
+    if not state:
+        state = new_state()
+    return state
+
+def write_state(state):
+    with open('../html/state', 'w') as f:
+        f.write(json.dumps(state, indent=4))
+    pass
+
+if os.path.exists('../html/state'):
+    state = init_state()
+
+# The Arena
 me_bot = basic_bot
 he_bot = random_bot
 players = [chess.WHITE, chess.BLACK]
@@ -93,50 +93,44 @@ min_turn_time = 1
 
 
 # In[ ]:
-
-with open('../html/since', 'w') as f:
-	f.write((datetime.fromtimestamp(time())+timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S'))
+if not state['played_since']:
+    state['played_since'] = (datetime.fromtimestamp(time())+timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
 
 while True:
-	
-	board = chess.Board() # Set up the board
-	me = choice(players)  # My color
+    
+    board = chess.Board() # Set up the board
+    me    = choice(players)  # My color
+    turn  = 0
 
-	with open('../html/player', 'w') as f:
-		f.write('Bot plays '+turn_color[me]+', '+turn_color[not me]+' is random\n')
-		
-	turn=0
-	while not board.is_game_over():
-		
-		t0 = time()
-		turn+=1
+    state['game_desc'] = 'Bot plays ' + turn_color[me] + ', ' + turn_color[not me] + ' is random\n'
+        
+    while not board.is_game_over():
+        
+        t0 = time()
+        turn+=1
 
-		
-		with open('../html/fen', 'w') as f:
-			f.write(board.fen())
-		
-		if board.turn == me:
-			with open('../html/status', 'w') as f:
-				f.write(str(1+turn/2) + ' - My move, ' + turn_color[board.turn])
-			move = me_bot.move(board) # My move!
-		else:
-			with open('../html/status', 'w') as f:
-				f.write(str(1+turn/2) + ' - His move, ' + turn_color[board.turn])
-			move = he_bot.move(board) # My opponent's move
+        state['fen'] = board.fen()
+        
+        if board.turn == me:
+            state['turn_desc'] = str(1+turn/2) + ' - My move, ' + turn_color[board.turn]
+            move = me_bot.move(board) # My move!
+        else:
+            state['turn_desc'] = str(1+turn/2) + ' - His move, ' + turn_color[board.turn]
+            move = he_bot.move(board) # My opponent's move
 
-		board.push(move) # Make the move
+        board.push(move) # Make the move
 
-		t1 = time()
-		if t1-t0 < min_turn_time:
-			sleep(min_turn_time - (t1-t0))
-			
-	with open('../html/fen', 'w') as f:
-			f.write(board.fen())
-	
-	with open('../html/status', 'w') as f:
-		f.write(get_status(board))
+        t1 = time()
+        if t1-t0 < min_turn_time:
+            sleep(min_turn_time - (t1-t0))
 
-	update_count(board, me)
-		
-	sleep(8)
+        write_state()
+    
+    state['fen'] = board.fen()
+    state['game_desc'] = get_status(board)
+    state[get_config(board, me)] += 1
+
+    write_state()
+        
+    sleep(8)
 
