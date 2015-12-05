@@ -124,7 +124,7 @@ while True:
         if t1-t0 < min_turn_time:
             sleep(min_turn_time - (t1-t0))
 
-        write_state()
+        write_state(state)
     
     state['fen'] = board.fen()
     state['game_desc'] = get_status(board)
