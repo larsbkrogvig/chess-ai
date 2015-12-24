@@ -9,6 +9,9 @@ from time import sleep
 from random import random, choice
 from collections import defaultdict 
 
+def name():
+    return "basic-1.0"
+
 
 # # Parameters
 
@@ -86,36 +89,6 @@ def eval_player(board, player):
 
     return score_material + score_presence + score_position
 
-def build_tree(tree, root_board, depth=0, nodes=0, limit=100):
-    
-    tree[depth].append((None,None,root_board.fen()))
-    
-    while nodes < limit:
-        
-        situations = tree[depth]
-        depth +=1
-        
-        for (fen0, move, fen1) in situations:
-            
-            if nodes >= limit:
-                break
-            
-            board = chess.Board()
-            board.set_fen(fen1)
-            
-            moves = best_moves(board)
-        
-            for move in moves:
-        
-                if nodes >= limit:
-                    break
-                    
-                new_board = board.copy()
-                new_board.push(move)
-                tree[depth].append((fen1,move,new_board.fen()))
-                nodes += 1
-            
-    return tree
 
 def best_moves(board, cap = 4):
     
@@ -128,67 +101,8 @@ def best_moves(board, cap = 4):
     return [move for i, (score, move) in enumerate(rated_moves) if i < cap]
 
 
-# # Mandatory functions
-
-# In[71]:
-
-#b = chess.Board()
-#tree = build_tree(defaultdict(list),b)
-#
-#for k in tree:
-#    print '\nLevel', k
-#    for kk in tree[k]:
-#        print ' ', kk
-
-
-# In[122]:
-
 def move(board, show=False):
-    sign = int(board.turn) - int(not board.turn)
-    
-    tree = build_tree(defaultdict(list), board)
- 
-    
-    book = {}
-    
-    deepest = sorted(tree.keys()).pop()
-                     
-    best_move = {}
-    best_eval = {}
-    
-    for (fen0, move, fen1) in tree[deepest]:
-        
-        if fen0 not in best_eval: 
-            best_eval[fen0] = -1 * sign * float('inf')
-        
-        new_board = chess.Board()
-        new_board.set_fen(fen1)
-        new_eval = eval_board(new_board)
-        
-        if sign * new_eval > sign * best_eval[fen0]:
-            best_move[fen0] = move
-            best_eval[fen0] = new_eval
-            book[(deepest-1,fen0)] = (best_move[fen0],best_eval[fen0])
-            
-    for k in [kk for kk in sorted(tree.keys(),reverse=True) if kk!=deepest]:
-        
-        best_move = {}
-        best_eval = {}
-        
-        for (fen0, move, fen1) in tree[k]:
-            
-            #print move
-            
-            if fen0 not in best_eval: 
-                best_eval[fen0] = -1 * sign * float('inf')
-            
-            if (k,fen1) in book:
-                (discard, new_eval) = book[(k,fen1)]
-                if sign * new_eval >= sign * best_eval[fen0]:
-                    best_move[fen0] = move
-                    best_eval[fen0] = new_eval
-                    book[(k-1,fen0)] = (best_move[fen0],best_eval[fen0])
-                                
-    return book[0,board.fen()][0]
+               
+    return best_moves(board).pop(0)
     
 

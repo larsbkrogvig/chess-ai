@@ -13,6 +13,9 @@ from random import random, choice
 
 # In[1]:
 
+def name():
+	return "random"
+
 def move(b, show=False):
     if show: print "Random move."
     return choice(list(b.legal_moves))

@@ -11,6 +11,8 @@ import random_bot
 import final_bot
 import basic_bot
 
+dev = True
+
 ### Functions
 
 def get_config(board, me):
@@ -102,6 +104,8 @@ while True:
     me    = choice(players)  # My color
     turn  = 0
 
+    cpu_time = {chess.WHITE: 0, chess.BLACK: 0}
+
     state['game_desc'] = 'Bot plays ' + turn_color[me] + ', ' + turn_color[not me] + ' is random\n'
         
     while not board.is_game_over():
@@ -111,14 +115,19 @@ while True:
 
         state['fen'] = board.fen()
         
+        tt = time()
         if board.turn == me:
             state['turn_desc'] = str(1+turn/2) + ' - My move, ' + turn_color[board.turn]
             move = me_bot.move(board) # My move!
         else:
             state['turn_desc'] = str(1+turn/2) + ' - His move, ' + turn_color[board.turn]
             move = he_bot.move(board) # My opponent's move
+        ct = time() - tt
+        cpu_time[board.turn] += ct
 
         board.push(move) # Make the move
+
+        if dev: print board
 
         t1 = time()
         if t1-t0 < min_turn_time:
@@ -128,9 +137,30 @@ while True:
     
     state['fen'] = board.fen()
     state['game_desc'] = get_status(board)
+
+    result = None
+    if board.is_checkmate(): 
+        result = turn_color[not board.turn]
+
     state[get_config(board, me)] += 1
 
     write_state(state)
+
+    log_entry = {
+        'move_stack': ','.join([str(move) for move in board.move_stack]),
+        'winner': turn_color[not board.turn] if board.is_checkmate() else None,
+        'white': {
+            'bot': me_bot.name if me == chess.WHITE else he_bot.name,
+            'cpu_time': cpu_time[chess.WHITE]
+            },
+        'black': {
+            'bot': me_bot.name if me == chess.BLACK else he_bot.name,
+            'cpu_time': cpu_time[chess.BLACK]
+            },
+        }
+
+    
+    write_command = 's3cmd put'
         
     sleep(8)
 
