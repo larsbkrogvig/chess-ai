@@ -8,8 +8,8 @@ from random import random, choice
 
 # Bots
 import random_bot
-import final_bot
-import basic_bot
+import basic_bot_1_0
+import basic_bot_1_11
 
 dev = True
 
@@ -88,7 +88,7 @@ if os.path.exists('../html/state'):
     state = init_state()
 
 # The Arena
-me_bot = basic_bot
+me_bot = basic_bot_1_11
 he_bot = random_bot
 players = [chess.WHITE, chess.BLACK]
 min_turn_time = 1
