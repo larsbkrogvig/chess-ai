@@ -11,7 +11,7 @@ import random_bot
 import basic_bot_1_0
 import basic_bot_1_11
 
-dev = True
+dev = False
 
 ### Functions
 
