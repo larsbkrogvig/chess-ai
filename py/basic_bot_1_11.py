@@ -9,6 +9,8 @@ from time import sleep
 from random import random, choice
 from collections import defaultdict 
 
+debug = False
+
 def name():
     return "basic-1.11"
 
@@ -64,26 +66,20 @@ for i in xrange(8):
         square_weight['atk'][chess.WHITE][chess.square(j,i)] = wa[chess.WHITE][i][j]/float(WA)
         square_weight['atk'][chess.BLACK][chess.square(j,i)] = wa[chess.BLACK][i][j]/float(WA)
 
-def eval_next_board(board, move):
-    board_next = board.copy()
-    board_next.push(move)
-    return eval_board(board_next)
 
 def eval_board(board):
-    
-    if board.is_game_over():
-        if board.is_checkmate(): 
-            result = -1 * (int(board.turn) - int(not board.turn)) * float('inf')
-        else:
-            result = 0
+
+    # Check for draw
+    if (board.is_stalemate() 
+        or board.is_insufficient_material() 
+        or board.is_seventyfive_moves()
+        or board.is_fivefold_repetition()
+        or board.can_claim_draw()
+        ):
+        return 0
     else:
-        result = eval_player(board, chess.WHITE) - eval_player(board, chess.BLACK)
-        
-    return result
+        return eval_player(board, chess.WHITE) - eval_player(board, chess.BLACK)
 
-def eval_attacks(board, player):  
-
-    pass
 
 def eval_player(board, player):
     
@@ -109,26 +105,20 @@ def eval_player(board, player):
     return score_material + (1-r)*score_presence + r*score_attacks
 
 
-def best_moves(board, cap = 4):
-    
-    legal_moves = board.legal_moves
-    
-    rated_moves = sorted([
-            (eval_next_board(board, move), move) for move in legal_moves
-            ], reverse = board.turn)
-
-    return [move for i, (score, move) in enumerate(rated_moves) if i < cap]
-
-
 def move(board, show=False):
     tree = build_tree(board)
     result = parse_tree(tree)
+    if debug:
+      for r in result:
+        print r
     return result[0].pop(0)
+
 
 def board_push(board, move):
     new_board = board.copy()
     new_board.push(move)
     return new_board
+
 
 def build_tree(root_board, halfmove_depth=1, limit_halfmove_depth=2):
 
@@ -140,11 +130,14 @@ def build_tree(root_board, halfmove_depth=1, limit_halfmove_depth=2):
                                                      limit_halfmove_depth=limit_halfmove_depth)) for move in root_board.legal_moves]}
     pass
 
+
 def parse_tree(tree):
+
     ans = _parse_tree(tree)
     return (ans[1:][::-1],ans[0])
 
-def _parse_tree(tree):
+
+def _parse_tree(tree, depth=0):
 
     root_board = chess.Board(tree.keys()[0])
     sign = int(root_board.turn) - int(not root_board.turn)
@@ -155,13 +148,26 @@ def _parse_tree(tree):
 
         if type(movelist[0][1])==str:
             sys.stdout.flush()
-            return list(max([(sign*eval_board(board_push(root_board, move)),move) for (move,fen) in movelist]))
+            ans = list(max([(sign*eval_board(board_push(root_board, move)),move) for (move,fen) in movelist]))
         else:
-            ans = max([(-1*t[0],t[1:]) for t in [_parse_tree(subtree)+[move] for (move, subtree) in movelist]])
-            return [ans[0]]+ans[1]
+            ansl = [(-1*t[0],t[1:]) for t in [_parse_tree(subtree,depth=depth+1)+[move] for (move, subtree) in movelist]]
+            ans = max(ansl)
+            ans = [ans[0]]+ans[1]
+
     else:
-        return list((-sign * float('inf'), None))
-    pass
+
+        if board.is_checkmate():
+            print "Looks like a checkmate"
+            ans = list((float('inf'), None))
+        else:
+            print "This must be draw"
+            ans = list((0, None))
+
+    if debug and depth==0:
+        for a in sorted(ansl):
+            print a
+
+    return ans
 
 
     

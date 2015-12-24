@@ -11,7 +11,7 @@ import random_bot
 import basic_bot_1_0
 import basic_bot_1_11
 
-dev = True
+dev = False
 
 ### Functions
 
@@ -72,19 +72,20 @@ def new_state():
 
 def init_state():
     state = None
-    if os.path.exists('../html/state.txt'):
-        with open('../html/state.txt', 'r') as f:
+    if os.path.exists('../html/state'):
+        with open('../html/state', 'r') as f:
             state = json.loads(f.read())
     if not state:
         state = new_state()
     return state
 
 def write_state(state):
-    with open('../html/state.txt', 'w') as f:
+    with open('../html/state', 'w') as f:
         f.write(json.dumps(state, indent=4))
     pass
 
-state = init_state()
+if os.path.exists('../html/state'):
+    state = init_state()
 
 # The Arena
 me_bot = basic_bot_1_11
@@ -111,8 +112,6 @@ while True:
         
         t0 = time()
         turn+=1
-
-        state['fen'] = board.fen()
         
         tt = time()
         if board.turn == me:
@@ -126,13 +125,11 @@ while True:
 
         board.push(move) # Make the move
 
-        if dev: print board
-
-        t1 = time()
-        if t1-t0 < min_turn_time:
-            sleep(min_turn_time - (t1-t0))
+        state['fen'] = board.fen()
 
         write_state(state)
+
+        raw_input('next')
     
     state['fen'] = board.fen()
     state['game_desc'] = get_status(board)
@@ -161,5 +158,5 @@ while True:
     
     write_command = 's3cmd put'
         
-    sleep(8)
+    raw_input('new game')
 
