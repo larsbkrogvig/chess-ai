@@ -156,11 +156,11 @@ def _parse_tree(tree, depth=0):
 
     else:
 
-        if board.is_checkmate():
-            print "Looks like a checkmate"
+        if root_board.is_checkmate():
+            if debug: print "Looks like a checkmate"
             ans = list((float('inf'), None))
         else:
-            print "This must be draw"
+            if debug: print "This must be draw"
             ans = list((0, None))
 
     if debug and depth==0:
