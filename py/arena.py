@@ -105,6 +105,7 @@ while True:
 
     cpu_time = {chess.WHITE: 0, chess.BLACK: 0}
 
+    state['fen'] = board.fen()
     state['game_desc'] = 'Bot plays ' + turn_color[me] + ', ' + turn_color[not me] + ' is random\n'
         
     while not board.is_game_over():
@@ -112,8 +113,6 @@ while True:
         t0 = time()
         turn+=1
 
-        state['fen'] = board.fen()
-        
         tt = time()
         if board.turn == me:
             state['turn_desc'] = str(1+turn/2) + ' - My move, ' + turn_color[board.turn]
@@ -125,6 +124,8 @@ while True:
         cpu_time[board.turn] += ct
 
         board.push(move) # Make the move
+
+        state['fen'] = board.fen()
 
         if dev: print board
 
