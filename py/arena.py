@@ -72,15 +72,15 @@ def new_state():
 
 def init_state():
     state = None
-    if os.path.exists('../html/state.txt'):
-        with open('../html/state.txt', 'r') as f:
+    if os.path.exists('../html/state'):
+        with open('../html/state', 'r') as f:
             state = json.loads(f.read())
     if not state:
         state = new_state()
     return state
 
 def write_state(state):
-    with open('../html/state.txt', 'w') as f:
+    with open('../html/state', 'w') as f:
         f.write(json.dumps(state, indent=4))
     pass
 

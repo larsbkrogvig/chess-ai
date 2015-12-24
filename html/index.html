@@ -44,7 +44,7 @@ var init = function() {
 var board = ChessBoard('board');
 polling()
 function polling() {
-  $.getJSON("state.txt", function(json) {
+  $.getJSON("state", function(json) {
     $("#played_since").html(json["played_since"]);
     $("#game_desc").html(json["game_desc"]);
     board.position(json["fen"]);
