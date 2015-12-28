@@ -9,7 +9,7 @@ from time import sleep
 from random import random, choice
 from collections import defaultdict 
 
-debug = False
+debug = True
 
 def name():
     return "basic-1.11"
@@ -66,76 +66,63 @@ for i in xrange(8):
         square_weight['atk'][chess.WHITE][chess.square(j,i)] = wa[chess.WHITE][i][j]/float(WA)
         square_weight['atk'][chess.BLACK][chess.square(j,i)] = wa[chess.BLACK][i][j]/float(WA)
 
-
 def eval_board(board):
 
-    # Check for draw
-    if (board.is_stalemate() 
-        or board.is_insufficient_material() 
-        or board.is_seventyfive_moves()
-        or board.is_fivefold_repetition()
-        or board.can_claim_draw()
-        ):
-        return 0
-    else:
-        return eval_player(board, chess.WHITE) - eval_player(board, chess.BLACK)
+    score = {chess.WHITE: {'material': 0, 'position': 0, 'attack': 0},
+             chess.BLACK: {'material': 0, 'position': 0, 'attack': 0}}
+    for s in chess.SQUARES:
+        p = board.piece_at(s)
+        if p:
+            score[p.color]['material'] += value_piece[p.piece_type]
+            score[p.color]['position'] += square_weight['pos'][s]
+        if board.is_attacked_by(chess.WHITE, s):
+            score[chess.WHITE]['attack'] += square_weight['atk'][chess.WHITE][s]
+        if board.is_attacked_by(chess.BLACK, s):
+            score[chess.BLACK]['attack'] += square_weight['atk'][chess.BLACK][s]
 
+    score_WHITE = score[chess.WHITE]['material'] + \
+                  (1-r) * score[chess.WHITE]['position'] + \
+                  r * score[chess.WHITE]['attack']
+    score_BLACK = score[chess.BLACK]['material'] + \
+                  (1-r) * score[chess.BLACK]['position'] + \
+                  r * score[chess.BLACK]['attack']
 
-def eval_player(board, player):
-    
-    score_material = 0
-    score_presence = 0
-    score_attacks = 0
-    
-    piece_squares = chess.SquareSet()
-    attack_squares = chess.SquareSet()
-    for piece_type in xrange(1,7):
-        piece_type_squares = board.pieces(piece_type, player)
-        piece_squares = piece_squares.union(piece_type_squares)
-        for square in piece_type_squares:
-            
-            score_material += value_piece[piece_type]
-            score_presence += square_weight['pos'][square]
-            attack_squares = attack_squares.union(board.attacks(square))
-    
-    attack_squares = attack_squares.difference(piece_squares)
-
-    score_attacks = reduce(lambda x,y: x+square_weight['atk'][player][y], attack_squares, 0)
-
-    return score_material + (1-r)*score_presence + r*score_attacks
-
+    return score_WHITE - score_BLACK
 
 def move(board, show=False):
     tree = build_tree(board)
     result = parse_tree(tree)
-    if debug:
-      for r in result:
-        print r
+    #if debug:
+    #  for r in result:
+    #    print r
     return result[0].pop(0)
-
-
-def board_push(board, move):
-    new_board = board.copy()
-    new_board.push(move)
-    return new_board
-
 
 def build_tree(root_board, halfmove_depth=1, limit_halfmove_depth=2):
 
     if halfmove_depth == limit_halfmove_depth:
-        return {root_board.fen(): [(move, board_push(root_board, move).fen()) for move in root_board.legal_moves]}
+        leaf = []
+        for move in root_board.legal_moves:
+            root_board.push(move)
+            fen = root_board.fen()
+            root_board.pop()
+            leaf.append((move, fen))
+        return {root_board.fen(): leaf}
     else:
-        return {root_board.fen(): [(move, build_tree(board_push(root_board, move),
-                                                     halfmove_depth=halfmove_depth+1,
-                                                     limit_halfmove_depth=limit_halfmove_depth)) for move in root_board.legal_moves]}
+        branch = []
+        for move in root_board.legal_moves:
+            root_board.push(move)
+            subbranch = build_tree(root_board, 
+                                   halfmove_depth=halfmove_depth+1,
+                                   limit_halfmove_depth=limit_halfmove_depth)
+            root_board.pop()
+            branch.append((move,subbranch))
+        return {root_board.fen(): branch}
     pass
-
 
 def parse_tree(tree):
 
     ans = _parse_tree(tree)
     return (ans[1:][::-1],ans[0])
-
 
 def _parse_tree(tree, depth=0):
 
@@ -148,7 +135,15 @@ def _parse_tree(tree, depth=0):
 
         if type(movelist[0][1])==str:
             sys.stdout.flush()
-            ans = list(max([(sign*eval_board(board_push(root_board, move)),move) for (move,fen) in movelist]))
+
+            leaf = []
+            for (move,fen) in movelist:
+                root_board.push(move)
+                evl = eval_board_f(root_board)
+                root_board.pop()
+                leaf.append((sign*evl,move))
+            ans = list(max(leaf))
+
         else:
             ansl = [(-1*t[0],t[1:]) for t in [_parse_tree(subtree,depth=depth+1)+[move] for (move, subtree) in movelist]]
             ans = max(ansl)
@@ -157,15 +152,15 @@ def _parse_tree(tree, depth=0):
     else:
 
         if root_board.is_checkmate():
-            if debug: print "Looks like a checkmate"
+            #if debug: print "Looks like a checkmate"
             ans = list((-1*float('inf'), None))
         else:
-            if debug: print "This must be draw"
+            #if debug: print "This must be draw"
             ans = list((0, None))
 
-    if debug and depth==0:
-        for a in sorted(ansl):
-            print a
+    #if debug and depth==0:
+    #    for a in sorted(ansl):
+    #        print a
 
     return ans
 
