@@ -8,10 +8,12 @@
   <link rel="stylesheet" href="css/chessboard-0.3.0.css" />
 </head>
 <body>
-<div id="turn_desc"></div>
 <br>
-<div id="game_desc"></div>
+<p><span id="player_white"></span></p>
 <div id="board" style="width: 400px"></div>
+<p><span id="player_black"></span></p>
+<br>
+<p><div id="turn_desc"></div></p>
 <br>
 <p>Stats since <span id="played_since"></span></p>
 <table border="1">
@@ -45,9 +47,10 @@ var board = ChessBoard('board');
 polling()
 function polling() {
   $.getJSON("state", function(json) {
-    $("#played_since").html(json["played_since"]);
-    $("#game_desc").html(json["game_desc"]);
     board.position(json["fen"]);
+    $("#played_since").html(json["played_since"]);
+    $("#player_white").html(json["player_white"]);
+    $("#player_black").html(json["player_black"]);
     $("#turn_desc").html(json["turn_desc"]);
     $("#W_win").html(json["W_win"]);
     $("#W_draw").html(json["W_draw"]);

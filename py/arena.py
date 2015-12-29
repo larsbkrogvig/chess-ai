@@ -58,7 +58,6 @@ turn_color = {
 def new_state():
     state = {
         'played_since': '',
-        'game_desc':    '',
         'fen':          '',
         'turn_desc':    '',
         'W_win':         0,
@@ -106,8 +105,13 @@ while True:
     cpu_time = {chess.WHITE: 0, chess.BLACK: 0}
 
     state['fen'] = board.fen()
-    state['game_desc'] = 'Bot plays ' + turn_color[me] + ', ' + turn_color[not me] + ' is random\n'
-        
+    if me == chess.WHITE:
+        state['player_white'] = me_bot.name
+        state['player_black'] = he_bot.name
+    else:
+        state['player_white'] = he_bot.name
+        state['player_black'] = me_bot.name
+
     while not board.is_game_over():
         
         t0 = time()
@@ -115,10 +119,10 @@ while True:
 
         tt = time()
         if board.turn == me:
-            state['turn_desc'] = str(1+turn/2) + ' - My move, ' + turn_color[board.turn]
+            state['turn_desc'] = str(1+turn/2) + ' - ' + turn_color[not board.turn] + ' to move'
             move = me_bot.move(board) # My move!
         else:
-            state['turn_desc'] = str(1+turn/2) + ' - His move, ' + turn_color[board.turn]
+            state['turn_desc'] = str(1+turn/2) + ' - ' + turn_color[not board.turn] + ' to move'
             move = he_bot.move(board) # My opponent's move
         ct = time() - tt
         cpu_time[board.turn] += ct
@@ -159,8 +163,5 @@ while True:
             },
         }
 
-    
-    write_command = 's3cmd put'
-        
     sleep(8)
 

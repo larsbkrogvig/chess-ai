@@ -139,7 +139,7 @@ def _parse_tree(tree, depth=0):
             leaf = []
             for (move,fen) in movelist:
                 root_board.push(move)
-                evl = eval_board_f(root_board)
+                evl = eval_board(root_board)
                 root_board.pop()
                 leaf.append((sign*evl,move))
             ans = list(max(leaf))
