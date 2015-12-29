@@ -140,7 +140,7 @@ while True:
         write_state(state)
     
     state['fen'] = board.fen()
-    state['game_desc'] = get_status(board)
+    state['turn_desc'] = get_status(board)
 
     result = None
     if board.is_checkmate(): 
