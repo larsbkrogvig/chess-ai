@@ -106,11 +106,11 @@ while True:
 
     state['fen'] = board.fen()
     if me == chess.WHITE:
-        state['player_white'] = me_bot.name
-        state['player_black'] = he_bot.name
+        state['player_white'] = me_bot.name()
+        state['player_black'] = he_bot.name()
     else:
-        state['player_white'] = he_bot.name
-        state['player_black'] = me_bot.name
+        state['player_white'] = he_bot.name()
+        state['player_black'] = me_bot.name()
 
     while not board.is_game_over():
         
