@@ -8,13 +8,10 @@
   <link rel="stylesheet" href="css/chessboard-0.3.0.css" />
 </head>
 <body>
-<br>
-<p><span id="player_white"></span></p>
+<h1>Bot plays random moves</h1>
+<p><span id="player_black" style="margin-left:2em"></span></p>
 <div id="board" style="width: 400px"></div>
-<p><span id="player_black"></span></p>
-<br>
-<p><div id="turn_desc"></div></p>
-<br>
+<p><span id="player_white" style="margin-left:2em"></span></p>
 <p>Stats since <span id="played_since"></span></p>
 <table border="1">
 <tr>
@@ -49,8 +46,8 @@ function polling() {
   $.getJSON("state", function(json) {
     board.position(json["fen"]);
     $("#played_since").html(json["played_since"]);
-    $("#player_white").html(json["player_white"]);
-    $("#player_black").html(json["player_black"]);
+    $("#player_white").html("WHITE <i>"+json["player_white"]+"</i>");
+    $("#player_black").html("BLACK <i>"+json["player_black"]+"</i>");
     $("#turn_desc").html(json["turn_desc"]);
     $("#W_win").html(json["W_win"]);
     $("#W_draw").html(json["W_draw"]);

@@ -1,12 +1,14 @@
 {
     "B_draw": 0, 
-    "fen": "rnb1k1nr/ppp2ppp/8/4p2P/2Pb4/3q1n2/8/4K3 w kq - 5 24", 
-    "W_win": 0, 
+    "player_black": "basic-1.11", 
+    "fen": "rnbqkbnr/pppp1ppp/8/4p3/P7/8/1PPPPPPP/RNBQKBNR w KQkq - 0 2", 
+    "W_win": 9, 
     "played_since": "2015-12-27 23:47:09", 
-    "turn_desc": "24 - My move, BLACK", 
+    "turn_desc": "2 - WHITE to move", 
     "B_lose": 0, 
+    "player_white": "random", 
     "W_lose": 0, 
-    "B_win": 6, 
+    "B_win": 17, 
     "W_draw": 0, 
     "game_desc": "Checkmate! BLACK wins"
 }
