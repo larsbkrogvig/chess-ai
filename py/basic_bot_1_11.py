@@ -68,8 +68,8 @@ for i in xrange(8):
 
 def eval_board(board):
 
-	if root_board.is_game_over():
-		if root_board.is_checkmate():
+	if board.is_game_over():
+		if board.is_checkmate():
 			return -1 * (int(root_board.turn)-int(not root_board.turn)) * float('inf')
 		else:
 			return 0
@@ -137,7 +137,15 @@ def _parse_tree(tree, depth=0):
 
 	movelist = tree.values()[0]
 
-	if movelist:
+	# Is the game over?
+	if root_board.is_game_over():
+		if root_board.is_checkmate():
+			ans = list((-1*float('inf'), None))
+		else:
+			ans = list((0, None))
+
+	# Are there legal moves?
+	elif movelist:
 
 		if type(movelist[0][1])==str:
 			sys.stdout.flush()
@@ -156,17 +164,7 @@ def _parse_tree(tree, depth=0):
 			ans = [ans[0]]+ans[1]
 
 	else:
-
-		if root_board.is_checkmate():
-			#if debug: print "Looks like a checkmate"
-			ans = list((-1*float('inf'), None))
-		else:
-			#if debug: print "This must be draw"
-			ans = list((0, None))
-
-	#if debug and depth==0:
-	#    for a in sorted(ansl):
-	#        print a
+		raise Exception('The game is not over, but there are no legal moves!')
 
 	return ans
 
