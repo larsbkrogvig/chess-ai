@@ -70,7 +70,7 @@ def eval_board(board):
 
 	if board.is_game_over():
 		if board.is_checkmate():
-			return -1 * (int(root_board.turn)-int(not root_board.turn)) * float('inf')
+			return -1 * (int(board.turn)-int(not board.turn)) * float('inf')
 		else:
 			return 0
 
@@ -105,7 +105,10 @@ def move(board, show=False):
 
 def build_tree(root_board, halfmove_depth=1, limit_halfmove_depth=2):
 
-	if halfmove_depth == limit_halfmove_depth:
+	# Is the game over?
+	if root_board.is_game_over():
+		return {root_board.fen(): []}
+	elif halfmove_depth == limit_halfmove_depth:
 		leaf = []
 		for move in root_board.legal_moves:
 			root_board.push(move)
@@ -137,15 +140,8 @@ def _parse_tree(tree, depth=0):
 
 	movelist = tree.values()[0]
 
-	# Is the game over?
-	if root_board.is_game_over():
-		if root_board.is_checkmate():
-			ans = list((-1*float('inf'), None))
-		else:
-			ans = list((0, None))
-
-	# Are there legal moves?
-	elif movelist:
+	# If there are moves
+	if movelist:
 
 		if type(movelist[0][1])==str:
 			sys.stdout.flush()
@@ -163,8 +159,10 @@ def _parse_tree(tree, depth=0):
 			ans = max(ansl)
 			ans = [ans[0]]+ans[1]
 
+	# No moves, game over
 	else:
-		raise Exception('The game is not over, but there are no legal moves!')
+		evl = eval_board(root_board)
+		ans = [(evl,None)]
 
 	return ans
 

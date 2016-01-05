@@ -9,7 +9,7 @@ from random import random, choice
 # Bots
 import random_bot
 import basic_bot_1_0
-import basic_bot_1_11
+import basic_bot_1_11b
 
 dev = False
 
@@ -44,7 +44,7 @@ def get_status(board):
         if board.is_seventyfive_moves(): result = 'Seventyfive moves without capture or pawn move. DRAW'
         if board.is_fivefold_repetition(): result = 'Fivefold repetition. DRAW'
     else:
-        result = turn_color[board.turn], 'to move'
+        result = turn_color[board.turn]
     return result
 
 ### Parameters
@@ -86,7 +86,7 @@ def write_state(state):
 state = init_state()
 
 # The Arena
-me_bot = basic_bot_1_11
+me_bot = basic_bot_1_11b
 he_bot = random_bot
 players = [chess.WHITE, chess.BLACK]
 min_turn_time = 1
@@ -119,10 +119,10 @@ while True:
 
         tt = time()
         if board.turn == me:
-            state['turn_desc'] = str(1+turn/2) + ' - ' + turn_color[not board.turn] + ' to move'
+            state['turn_desc'] = 'Move ' + str(1+turn/2) + ', ' + turn_color[not board.turn] + ' to move'
             move = me_bot.move(board) # My move!
         else:
-            state['turn_desc'] = str(1+turn/2) + ' - ' + turn_color[not board.turn] + ' to move'
+            state['turn_desc'] = 'Move ' + str(1+turn/2) + ', ' + turn_color[not board.turn] + ' to move'
             move = he_bot.move(board) # My opponent's move
         ct = time() - tt
         cpu_time[board.turn] += ct
