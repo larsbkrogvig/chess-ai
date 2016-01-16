@@ -33,8 +33,9 @@ class ChessBot(object):
         """Return the best move on the given chess.Board 'inboard'."""
 
         # Update own board with opponent's move
-        move_opponent = inboard.peek()
-        self.board.push(move_opponent)
+        if inboard.move_stack:
+            move_opponent = inboard.peek()
+            self.board.push(move_opponent)
 
         # Build a move tree
         self.tree = self._build_tree()
