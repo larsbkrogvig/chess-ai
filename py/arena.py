@@ -100,6 +100,7 @@ if not state['played_since']:
 
 while True:
     
+    me_bot.reset()
     board = chess.Board() # Set up the board
     me    = choice(players)  # My color
     turn  = 0

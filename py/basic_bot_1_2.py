@@ -29,6 +29,14 @@ class ChessBot(object):
 
         self._init_weight()
 
+    def reset(self):
+        self.board = chess.Board()
+        self.meta = {
+            chess.WHITE: ChessMeta(chess.WHITE),
+            chess.BLACK: ChessMeta(chess.BLACK)
+        }
+        self.tree = None
+
     def move(self, inboard, debug=False):
         """Return the best move on the given chess.Board 'inboard'."""
 
@@ -36,8 +44,7 @@ class ChessBot(object):
         if inboard.move_stack:
             move_opponent = inboard.peek()
             self.board.push(move_opponent)
-        else:
-            self.__init__()
+            
 
         # Build a move tree
         self.tree = self._build_tree()
