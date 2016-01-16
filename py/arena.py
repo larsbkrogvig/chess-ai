@@ -10,8 +10,8 @@ from random import random, choice, seed
 import random_bot
 import basic_bot_1_2
 
-dev = True
-profile = True
+dev = False
+profile = False
 
 if profile: seed(0)
 
