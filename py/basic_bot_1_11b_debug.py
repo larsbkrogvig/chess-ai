@@ -9,8 +9,6 @@ from time import sleep
 from random import random, choice
 from collections import defaultdict 
 
-debug = False
-
 def name():
     return "basic-1.11b"
 
@@ -97,7 +95,7 @@ def eval_board(board):
 
 def move(board, show=False):
     root = build_tree(board)
-    result = parse_tree(root, debug=debug)
+    result = parse_tree(root, debug=show)
     return result['line'].pop()
 
 def build_tree(root_board, halfmove_depth=0, halfmove_depth_limit=2):
@@ -148,20 +146,25 @@ def parse_tree(root, depth=0, debug=False):
         best_eval = -1*float('inf')
 
         # Check all possible next states
+        nodes = []
+
         for move in root['moves']:
             node = parse_tree(root[move], depth=depth+1)
 
-            # Show evaluation of all top level moves?
-            if debug and depth == 0:
-                debug_node = node
-                debug_node['line'].append(move)
-                print debug_node
+            nodes.append(node)
 
             # If the state is better, take it
             if sign*node['eval'] >= best_eval:
                 best_eval = sign*node['eval']
                 best_move = move
                 best_node = node
+
+        if debug and depth == 0:
+            nodes = sorted(nodes, key=lambda k: k['eval'])
+            print '\n'
+            for node in nodes:
+                print node
+            print 'best:', best_node
 
         # Add the best move to the line, keep the evaluation
         best_node['line'].append(best_move)

@@ -114,6 +114,9 @@ def build_tree(root_board, halfmove_depth=0, halfmove_depth_limit=2):
                     'moves': list(root_board.legal_moves)
                     }
 
+        if halfmove_depth == 0:
+            new_root['board'] = root_board
+
         for move in new_root['moves']:
 
             # Make a legal move
@@ -129,10 +132,12 @@ def build_tree(root_board, halfmove_depth=0, halfmove_depth_limit=2):
         return new_root
 
 
-def parse_tree(root, depth=0, debug=False):
+def parse_tree(root, root_board=None, depth=0, debug=False):
+
+    if depth == 0:
+        root_board = root['board']
 
     # Get the direction to maximize the evaluation
-    root_board = chess.Board(root['fen'])
     sign = int(root_board.turn) - int(not root_board.turn)
 
     # If this is a leaf node the game is over or the depth is reached
@@ -149,7 +154,15 @@ def parse_tree(root, depth=0, debug=False):
 
         # Check all possible next states
         for move in root['moves']:
-            node = parse_tree(root[move], depth=depth+1)
+
+            # Make the move
+            root_board.push(move)
+
+            # Evaluate the new state
+            node = parse_tree(root[move], root_board=root_board, depth=depth+1)
+
+            # Undo the move
+            root_board.pop()
 
             # Show evaluation of all top level moves?
             if debug and depth == 0:

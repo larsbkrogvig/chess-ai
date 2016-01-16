@@ -4,14 +4,16 @@ import json
 import chess
 from time import sleep, time
 from datetime import datetime, timedelta
-from random import random, choice
+from random import random, choice, seed
 
 # Bots
 import random_bot
-import basic_bot_1_0
-import basic_bot_1_11b
+import basic_bot_1_2
 
-dev = False
+dev = True
+profile = True
+
+if profile: seed(0)
 
 ### Functions
 
@@ -86,7 +88,7 @@ def write_state(state):
 state = init_state()
 
 # The Arena
-me_bot = basic_bot_1_11b
+me_bot = basic_bot_1_2.ChessBot()
 he_bot = random_bot
 players = [chess.WHITE, chess.BLACK]
 min_turn_time = 1
@@ -106,11 +108,11 @@ while True:
 
     state['fen'] = board.fen()
     if me == chess.WHITE:
-        state['player_white'] = me_bot.name()
+        state['player_white'] = me_bot.name
         state['player_black'] = he_bot.name()
     else:
         state['player_white'] = he_bot.name()
-        state['player_black'] = me_bot.name()
+        state['player_black'] = me_bot.name
 
     while not board.is_game_over():
         
@@ -134,7 +136,7 @@ while True:
         if dev: print board
 
         t1 = time()
-        if t1-t0 < min_turn_time:
+        if t1-t0 < min_turn_time and not profile:
             sleep(min_turn_time - (t1-t0))
 
         write_state(state)
@@ -163,5 +165,8 @@ while True:
             },
         }
 
+    if profile: break
+
     sleep(8)
+
 
