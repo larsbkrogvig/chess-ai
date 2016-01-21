@@ -17,6 +17,7 @@ class ChessArena(object):
         self.arena_start_time = (datetime.datetime.fromtimestamp(time.time())+datetime.timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
         self.game_count = 0
         self.game_start_time = None
+        self.state_post_time = 0
         self.board = None
         self.player = None
         self.bot1 = bot1
@@ -24,6 +25,7 @@ class ChessArena(object):
         self.me = None
         self.state = {
             'fen': None,
+            'played_since': self.arena_start_time,
             'player_white': None,
             'player_black': None,
             'winner': None,
@@ -39,50 +41,6 @@ class ChessArena(object):
         # Seed if a seed is supplied
         if seed:
             random.seed(seed)
-
-    def wait_for_sync(self):
-        '''Wait for the number of seconds since the game started to become integer'''
-        time.sleep( (self.game_start_time - time.time()) % 1 )
-
-    def post_state(self):
-        '''Writes a json file with the current state to poll'''
-
-        # Write the position state
-        self.state['fen'] = self.board.fen()
-
-        fullmove_number = self.board.fullmove_number
-
-        # Write desc 
-        if not self.board.is_game_over():
-            #Turn and player if the game is ongoing
-            self.state['desc'] = 'Turn %i, %s to move' % (fullmove_number, 'WHITE' if self.board.turn else 'BLACK')
-        
-        elif self.board.is_checkmate():
-            # Winner of the game if checkmate
-            self.state['desc'] = 'Turn %i, Game over! %s wins!' % (fullmove_number, 'WHITE' if not self.board.turn else 'BLACK')
-            self.state['winner'] = (not self.board.turn)
-
-        else:
-            # Draw if draw, no reason given
-            self.state['desc'] = 'Turn %i, Draw!' % fullmove_number
-            self.state['winner'] = None
-
-        with open('../html/state', 'w') as f:
-            f.write(json.dumps(self.state, indent=4))
-
-    def make_move(self):
-        '''Gets a move from the current player and pushes it to the board'''
-
-        # Have the current player return a move 
-        move = self.player[self.board.turn].move(self.board)
-
-        # Push the move on the arena
-        self.board.push(move)
-
-
-    def game_is_ongoing(self):
-        '''Return True if a game is onging, False if not'''
-        return not self.board.is_game_over()
 
     def new_game(self):
         '''Initialize a new game'''
@@ -111,27 +69,52 @@ class ChessArena(object):
         self.state['player_black'] = self.player[chess.BLACK].name
         self.state['winner'] = None
 
-    def log_draw_reason(self):
-        '''Logs the reason of a draw for manual inspection'''
+    def game_is_ongoing(self):
+        '''Return True if a game is onging, False if not'''
+        return not self.board.is_game_over()
 
-        if self.board.is_stalemate(): 
-            reason = 'Stalemate.'
-        elif self.board.is_insufficient_material(): 
-            reason = 'Insufficient material.', 
-        elif self.board.is_seventyfive_moves(): 
-            reason = 'Seventyfive moves without capture or pawn move.'
-        elif self.board.is_fivefold_repetition(): 
-            reason = 'Fivefold repetition.'
+    def make_move(self):
+        '''Gets a move from the current player and pushes it to the board'''
+
+        # Have the current player return a move 
+        move = self.player[self.board.turn].move(self.board)
+
+        # Push the move on the arena
+        self.board.push(move)
+
+    def post_state(self):
+        '''Writes a json file with the current state to poll'''
+
+        # Write the position state
+        self.state['fen'] = self.board.fen()
+
+        fullmove_number = self.board.fullmove_number
+
+        # Write desc 
+        if not self.board.is_game_over():
+            #Turn and player if the game is ongoing
+            self.state['desc'] = 'Turn %i, %s to move' % (fullmove_number, 'WHITE' if self.board.turn else 'BLACK')
+        
+        elif self.board.is_checkmate():
+            # Winner of the game if checkmate
+            self.state['desc'] = 'Turn %i, Game over! %s wins!' % (fullmove_number, 'WHITE' if not self.board.turn else 'BLACK')
+            self.state['winner'] = (not self.board.turn)
+
         else:
-            reason = 'Unknown reason for draw?'
+            # Draw if draw, no reason given
+            self.state['desc'] = 'Turn %i, Draw!' % fullmove_number
+            self.state['winner'] = None
 
-        log_entry = {
-            'reason': reason,
-            'move_stack': ','.join([str(move) for move in self.board.move_stack])
-        }
+        with open('../html/state', 'w') as f:
+            f.write(json.dumps(self.state, indent=4))
 
-        with open('../log/%i_draw' % self.game_count, 'w') as f:
-            f.write(json.dumps(log_entry, indent=4))
+        # Note the time
+        self.state_post_time = time.time()
+
+    def wait_for_sync(self):
+        '''Wait until one second has passed since last state post'''
+        time.sleep(max(0, 1 - (time.time() - self.state_post_time)))
+
 
     def update_result_statistics(self):
         '''Count the game and update the result statistics in self.state'''
@@ -162,14 +145,36 @@ class ChessArena(object):
         # Post the update of the counter
         self.post_state()
 
+    def log_draw_reason(self):
+        '''Logs the reason of a draw for manual inspection'''
+
+        if self.board.is_stalemate(): 
+            reason = 'Stalemate.'
+        elif self.board.is_insufficient_material(): 
+            reason = 'Insufficient material.', 
+        elif self.board.is_seventyfive_moves(): 
+            reason = 'Seventyfive moves without capture or pawn move.'
+        elif self.board.is_fivefold_repetition(): 
+            reason = 'Fivefold repetition.'
+        else:
+            reason = 'Unknown reason for draw?'
+
+        log_entry = {
+            'reason': reason,
+            'move_stack': ','.join([str(move) for move in self.board.move_stack])
+        }
+
+        with open('../log/%i_draw' % self.game_count, 'w') as f:
+            f.write(json.dumps(log_entry, indent=4))
+
 def main():
 
     # Set the players
-    player1 = random_bot
-    player2 = basic_bot_1_2
+    player1 = basic_bot_1_2
+    player2 = random_bot
 
     # Initialize the arena
-    arena = ChessArena(player2, player2)
+    arena = ChessArena(player1, player2)
 
     # Play games indefinetly
     while True:
@@ -179,8 +184,9 @@ def main():
         while arena.game_is_ongoing(): # Play the game
 
             arena.make_move() # Have the current player make a move
-            arena.post_state() # Write a json of the current state
             arena.wait_for_sync() # Wait for the next full second
+            arena.post_state() # Write a json of the current state
+            
 
         # Update statustics
         arena.update_result_statistics()
