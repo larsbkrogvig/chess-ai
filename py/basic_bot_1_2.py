@@ -45,7 +45,6 @@ class ChessBot(object):
             move_opponent = inboard.peek()
             self.board.push(move_opponent)
             
-
         # Build a move tree
         self.tree = self._build_tree()
 
