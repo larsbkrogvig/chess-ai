@@ -1,4 +1,4 @@
 # chess-ai
 Chess bots!
 
-On a good day, the results of this can be seen here: www.larsbk.top
+On good days, the results of this can be seen here: www.larsbk.top
